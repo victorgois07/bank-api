@@ -1,0 +1,656 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"%24Enums.AccountType": {
+				"type": "string",
+				"enum": [
+					"CORRENTE",
+					"POUPANCA"
+				]
+			},
+			"AccountType": {
+				"$ref": "#/components/schemas/%24Enums.AccountType"
+			},
+			"%24Result.DefaultSelection_Prisma.%24AccountTransactionPayload_": {
+				"properties": {
+					"transactionId": {
+						"type": "string"
+					},
+					"bankAccountId": {
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"transactionId",
+					"bankAccountId",
+					"id"
+				],
+				"type": "object"
+			},
+			"AccountTransaction": {
+				"$ref": "#/components/schemas/%24Result.DefaultSelection_Prisma.%24AccountTransactionPayload_",
+				"description": "Model AccountTransaction"
+			},
+			"BankAccount": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"accountNumber": {
+						"type": "string"
+					},
+					"accountType": {
+						"$ref": "#/components/schemas/AccountType"
+					},
+					"balance": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"sentTransactions": {
+						"items": {
+							"$ref": "#/components/schemas/AccountTransaction"
+						},
+						"type": "array",
+						"default": []
+					},
+					"receivedTransactions": {
+						"items": {
+							"$ref": "#/components/schemas/AccountTransaction"
+						},
+						"type": "array",
+						"default": []
+					}
+				},
+				"required": [
+					"id",
+					"accountNumber",
+					"accountType",
+					"balance",
+					"createdAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"%24Enums.TransactionType": {
+				"type": "string",
+				"enum": [
+					"PIX",
+					"DEPOSIT",
+					"WITHDRAW"
+				]
+			},
+			"TransactionType": {
+				"$ref": "#/components/schemas/%24Enums.TransactionType"
+			},
+			"Transaction": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"type": {
+						"$ref": "#/components/schemas/TransactionType"
+					},
+					"pixKey": {
+						"type": "string"
+					},
+					"isReverted": {
+						"type": "boolean"
+					},
+					"bankAccountFrom": {
+						"$ref": "#/components/schemas/Partial_AccountTransaction_"
+					},
+					"bankAccountTo": {
+						"$ref": "#/components/schemas/Partial_AccountTransaction_"
+					}
+				},
+				"required": [
+					"amount",
+					"type"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Partial_AccountTransaction_": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"bankAccountId": {
+						"type": "string"
+					},
+					"transactionId": {
+						"type": "string"
+					},
+					"fromAccount": {
+						"$ref": "#/components/schemas/BankAccount"
+					},
+					"toAccount": {
+						"$ref": "#/components/schemas/BankAccount"
+					},
+					"sentTransaction": {
+						"$ref": "#/components/schemas/Transaction"
+					},
+					"receivedTransaction": {
+						"$ref": "#/components/schemas/Transaction"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "bank-api",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/bank-accounts": {
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BankAccount"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"accountType": {
+										"$ref": "#/components/schemas/AccountType"
+									},
+									"accountNumber": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"accountType",
+									"accountNumber"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "List",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/BankAccount"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/bank-accounts/{accountNumber}": {
+			"get": {
+				"operationId": "Read",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/BankAccount"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "Update",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BankAccount"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"balance": {
+										"type": "number",
+										"format": "double"
+									},
+									"accountType": {
+										"$ref": "#/components/schemas/AccountType"
+									}
+								},
+								"required": [
+									"balance",
+									"accountType"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bank-accounts/by-id/{id}": {
+			"get": {
+				"operationId": "FindById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/BankAccount"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bank-accounts/{accountNumber}/deposit": {
+			"post": {
+				"operationId": "Deposit",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BankAccount"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"amount": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"amount"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/bank-accounts/{accountNumber}/withdraw": {
+			"post": {
+				"operationId": "Withdraw",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BankAccount"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"amount": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"amount"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/bank-accounts/search": {
+			"post": {
+				"operationId": "Search",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/BankAccount"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"minBalance": {
+										"type": "number",
+										"format": "double"
+									},
+									"accountType": {
+										"$ref": "#/components/schemas/AccountType"
+									}
+								},
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/bank-accounts/transaction": {
+			"post": {
+				"operationId": "CreateNewTransaction",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Transaction"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"type": {
+										"$ref": "#/components/schemas/TransactionType"
+									},
+									"amount": {
+										"type": "number",
+										"format": "double"
+									},
+									"toAccountNumber": {
+										"type": "string"
+									},
+									"fromAccountNumber": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"type",
+									"amount",
+									"toAccountNumber",
+									"fromAccountNumber"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/bank-accounts/{accountNumber}/recent-transactions": {
+			"get": {
+				"operationId": "GetRecentTransactions",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Transaction"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bank-accounts/transfer": {
+			"post": {
+				"operationId": "Transfer",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"amount": {
+										"type": "number",
+										"format": "double"
+									},
+									"toAccountNumber": {
+										"type": "string"
+									},
+									"fromAccountNumber": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"amount",
+									"toAccountNumber",
+									"fromAccountNumber"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/bank-accounts/{accountNumber}/transactions": {
+			"get": {
+				"operationId": "GetTransactionsForAccount",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Transaction"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountType {
+  CORRENTE
+  POUPANCA
+}
+
+enum TransactionType {
+  PIX
+  DEPOSIT
+  WITHDRAW
+}
+
+model BankAccount {
+  id                   String               @id @default(auto()) @map("_id") @db.ObjectId
+  accountNumber        String               @unique
+  accountType          AccountType
+  balance              Float
+  createdAt            DateTime             @default(now())
+  sentTransactions     AccountTransaction[] @relation("SentTransactions")
+  receivedTransactions AccountTransaction[] @relation("ReceivedTransactions")
+}
+
+model Transaction {
+  id              String              @id @default(auto()) @map("_id") @db.ObjectId
+  amount          Float
+  type            TransactionType
+  isReverted      Boolean             @default(false)
+  pixKey          String?             @unique
+  createdAt       DateTime            @default(now())
+  bankAccountFrom AccountTransaction? @relation("TransactionFromAccount")
+  bankAccountTo   AccountTransaction? @relation("TransactionToAccount")
+}
+
+model AccountTransaction {
+  id                  String       @id @default(auto()) @map("_id") @db.ObjectId
+  bankAccountId       String       @db.ObjectId
+  transactionId       String       @unique @db.ObjectId
+  fromAccount         BankAccount? @relation("SentTransactions", fields: [bankAccountId], references: [id])
+  toAccount           BankAccount? @relation("ReceivedTransactions", fields: [bankAccountId], references: [id])
+  sentTransaction     Transaction? @relation("TransactionFromAccount", fields: [transactionId], references: [id])
+  receivedTransaction Transaction? @relation("TransactionToAccount", fields: [transactionId], references: [id])
+}
+
+model Log {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  message   String
+  level     String
+  timestamp DateTime @default(now())
+}

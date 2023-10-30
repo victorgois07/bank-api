@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+  mongo:
+    build: .
+    container_name: mongo-dev
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: bankapi
+      MONGO_REPLICA_HOST: localhost
+      MONGO_REPLICA_PORT: '27017'
+    ports:
+      - '27017:27017'
+    restart: always
