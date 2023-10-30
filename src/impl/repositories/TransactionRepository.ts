@@ -1,12 +1,8 @@
 import { AccountTransaction } from '../../core/entities/AccountTransaction';
-import { BankAccount } from '../../core/entities/BankAccount';
-import { Transaction } from '../../core/entities/Transaction';
+import { AccountType, BankAccount } from '../../core/entities/BankAccount';
+import { Transaction, TransactionType } from '../../core/entities/Transaction';
 import { ITransactionRepository } from '../../core/repositories/TransactionRepository';
-import {
-  Prisma,
-  PrismaClient,
-  TransactionType,
-} from '../infra/db/prisma/generated/client';
+import { Prisma, PrismaClient } from '../infra/db/prisma/generated/client';
 
 export class TransactionRepository implements ITransactionRepository {
   private prisma: PrismaClient;
@@ -117,7 +113,8 @@ export class TransactionRepository implements ITransactionRepository {
       fromAccount: transactionFromDB.bankAccountFrom?.fromAccount
         ? new BankAccount(
             transactionFromDB.bankAccountFrom.fromAccount.accountNumber,
-            transactionFromDB.bankAccountFrom.fromAccount.accountType,
+            transactionFromDB.bankAccountFrom.fromAccount
+              .accountType as AccountType,
             transactionFromDB.bankAccountFrom.fromAccount.balance,
             transactionFromDB.bankAccountFrom.fromAccount.createdAt
           )
@@ -131,7 +128,8 @@ export class TransactionRepository implements ITransactionRepository {
       toAccount: transactionFromDB.bankAccountTo?.toAccount
         ? new BankAccount(
             transactionFromDB.bankAccountTo.toAccount.accountNumber,
-            transactionFromDB.bankAccountTo.toAccount.accountType,
+            transactionFromDB.bankAccountTo.toAccount
+              .accountType as AccountType,
             transactionFromDB.bankAccountTo.toAccount.balance,
             transactionFromDB.bankAccountTo.toAccount.createdAt
           )
@@ -140,7 +138,7 @@ export class TransactionRepository implements ITransactionRepository {
 
     return new Transaction(
       transactionFromDB.amount,
-      transactionFromDB.type,
+      transactionFromDB.type as TransactionType,
       transactionFromDB.pixKey || undefined,
       transactionFromDB.isReverted,
       transformedBankAccountFrom,
@@ -180,7 +178,7 @@ export class TransactionRepository implements ITransactionRepository {
 
     return new Transaction(
       transactionUpdate.amount,
-      transactionUpdate.type,
+      transactionUpdate.type as TransactionType,
       transactionUpdate.pixKey || undefined
     );
   }
@@ -228,7 +226,7 @@ export class TransactionRepository implements ITransactionRepository {
       (transaction) =>
         new Transaction(
           transaction.amount,
-          transaction.type,
+          transaction.type as TransactionType,
           transaction.pixKey || undefined
         )
     );
@@ -243,7 +241,7 @@ export class TransactionRepository implements ITransactionRepository {
       (transaction) =>
         new Transaction(
           transaction.amount,
-          transaction.type,
+          transaction.type as TransactionType,
           transaction.pixKey || undefined
         )
     );
@@ -266,7 +264,7 @@ export class TransactionRepository implements ITransactionRepository {
       (transaction) =>
         new Transaction(
           transaction.amount,
-          transaction.type,
+          transaction.type as TransactionType,
           transaction.pixKey || undefined
         )
     );
@@ -281,7 +279,7 @@ export class TransactionRepository implements ITransactionRepository {
       (transaction) =>
         new Transaction(
           transaction.amount,
-          transaction.type,
+          transaction.type as TransactionType,
           transaction.pixKey || undefined
         )
     );
@@ -326,7 +324,7 @@ export class TransactionRepository implements ITransactionRepository {
       (transaction) =>
         new Transaction(
           transaction.amount,
-          transaction.type,
+          transaction.type as TransactionType,
           transaction.pixKey || undefined
         )
     );
@@ -367,7 +365,7 @@ export class TransactionRepository implements ITransactionRepository {
       (transaction) =>
         new Transaction(
           transaction.amount,
-          transaction.type,
+          transaction.type as TransactionType,
           transaction.pixKey || undefined
         )
     );
@@ -418,7 +416,7 @@ export class TransactionRepository implements ITransactionRepository {
       (transaction) =>
         new Transaction(
           transaction.amount,
-          transaction.type,
+          transaction.type as TransactionType,
           transaction.pixKey || undefined
         )
     );

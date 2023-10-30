@@ -1,6 +1,11 @@
 import { ObjectId } from 'bson';
-import { TransactionType } from '../../impl/infra/db/prisma/generated/client';
 import { AccountTransaction } from './AccountTransaction';
+
+export enum TransactionType {
+  PIX = 'PIX',
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAW = 'WITHDRAW',
+}
 
 export class Transaction {
   id?: string;

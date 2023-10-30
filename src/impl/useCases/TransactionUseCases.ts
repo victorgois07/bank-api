@@ -1,5 +1,4 @@
-import { Transaction } from '../../core/entities/Transaction';
-import { TransactionType } from '../infra/db/prisma/generated/client';
+import { Transaction, TransactionType } from '../../core/entities/Transaction';
 import { BankAccountRepository } from '../repositories/BankAccountRepository';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 

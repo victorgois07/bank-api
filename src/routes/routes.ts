@@ -3,30 +3,33 @@
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { Controller, ValidationService, FieldErrors, ValidateError, TsoaRoute, HttpStatusCodeLiteral, TsoaResponse, fetchMiddlewares } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { AccountTransactionController } from './../impl/controllers/AccountTransactionController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { BankAccountController } from './../impl/controllers/BankAccountController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { TransactionController } from './../impl/controllers/TransactionController';
 import type { RequestHandler, Router } from 'express';
 
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "%24Enums.AccountType": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["CORRENTE"]},{"dataType":"enum","enums":["POUPANCA"]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AccountType": {
-        "dataType": "refAlias",
-        "type": {"ref":"%24Enums.AccountType","validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "%24Result.DefaultSelection_Prisma.%24AccountTransactionPayload_": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"transactionId":{"dataType":"string","required":true},"bankAccountId":{"dataType":"string","required":true},"id":{"dataType":"string","required":true}},"validators":{}},
+        "dataType": "refEnum",
+        "enums": ["CORRENTE","POUPANCA"],
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AccountTransaction": {
-        "dataType": "refAlias",
-        "type": {"ref":"%24Result.DefaultSelection_Prisma.%24AccountTransactionPayload_","validators":{}},
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string"},
+            "bankAccountId": {"dataType":"string","required":true},
+            "transactionId": {"dataType":"string","required":true},
+            "fromAccount": {"ref":"BankAccount"},
+            "toAccount": {"ref":"BankAccount"},
+            "sentTransaction": {"ref":"Transaction"},
+            "receivedTransaction": {"ref":"Transaction"},
+        },
+        "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "BankAccount": {
@@ -37,20 +40,15 @@ const models: TsoaRoute.Models = {
             "accountType": {"ref":"AccountType","required":true},
             "balance": {"dataType":"double","required":true},
             "createdAt": {"dataType":"datetime","required":true},
-            "sentTransactions": {"dataType":"array","array":{"dataType":"refAlias","ref":"AccountTransaction"},"default":[]},
-            "receivedTransactions": {"dataType":"array","array":{"dataType":"refAlias","ref":"AccountTransaction"},"default":[]},
+            "sentTransactions": {"dataType":"array","array":{"dataType":"refObject","ref":"AccountTransaction"},"default":[]},
+            "receivedTransactions": {"dataType":"array","array":{"dataType":"refObject","ref":"AccountTransaction"},"default":[]},
         },
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "%24Enums.TransactionType": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["PIX"]},{"dataType":"enum","enums":["DEPOSIT"]},{"dataType":"enum","enums":["WITHDRAW"]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "TransactionType": {
-        "dataType": "refAlias",
-        "type": {"ref":"%24Enums.TransactionType","validators":{}},
+        "dataType": "refEnum",
+        "enums": ["PIX","DEPOSIT","WITHDRAW"],
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Transaction": {
@@ -82,6 +80,131 @@ export function RegisterRoutes(app: Router) {
     //  NOTE: If you do not see routes for all of your controllers in this file, then you might not have informed tsoa of where to look
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
+        app.post('/account-transactions',
+            ...(fetchMiddlewares<RequestHandler>(AccountTransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(AccountTransactionController.prototype.createTransaction)),
+
+            function AccountTransactionController_createTransaction(request: any, response: any, next: any) {
+            const args = {
+                    transactionData: {"in":"body","name":"transactionData","required":true,"ref":"AccountTransaction"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new AccountTransactionController();
+
+
+              const promise = controller.createTransaction.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/account-transactions/:transactionId',
+            ...(fetchMiddlewares<RequestHandler>(AccountTransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(AccountTransactionController.prototype.getTransactionById)),
+
+            function AccountTransactionController_getTransactionById(request: any, response: any, next: any) {
+            const args = {
+                    transactionId: {"in":"path","name":"transactionId","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new AccountTransactionController();
+
+
+              const promise = controller.getTransactionById.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.put('/account-transactions/:transactionId',
+            ...(fetchMiddlewares<RequestHandler>(AccountTransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(AccountTransactionController.prototype.updateTransaction)),
+
+            function AccountTransactionController_updateTransaction(request: any, response: any, next: any) {
+            const args = {
+                    transactionId: {"in":"path","name":"transactionId","required":true,"dataType":"string"},
+                    transactionData: {"in":"body","name":"transactionData","required":true,"ref":"AccountTransaction"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new AccountTransactionController();
+
+
+              const promise = controller.updateTransaction.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.delete('/account-transactions/:transactionId',
+            ...(fetchMiddlewares<RequestHandler>(AccountTransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(AccountTransactionController.prototype.deleteTransaction)),
+
+            function AccountTransactionController_deleteTransaction(request: any, response: any, next: any) {
+            const args = {
+                    transactionId: {"in":"path","name":"transactionId","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new AccountTransactionController();
+
+
+              const promise = controller.deleteTransaction.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/account-transactions',
+            ...(fetchMiddlewares<RequestHandler>(AccountTransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(AccountTransactionController.prototype.listTransactions)),
+
+            function AccountTransactionController_listTransactions(request: any, response: any, next: any) {
+            const args = {
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new AccountTransactionController();
+
+
+              const promise = controller.listTransactions.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/bank-accounts',
             ...(fetchMiddlewares<RequestHandler>(BankAccountController)),
             ...(fetchMiddlewares<RequestHandler>(BankAccountController.prototype.create)),
@@ -403,6 +526,259 @@ export function RegisterRoutes(app: Router) {
 
 
               const promise = controller.getTransactionsForAccount.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/transactions',
+            ...(fetchMiddlewares<RequestHandler>(TransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(TransactionController.prototype.createTransaction)),
+
+            function TransactionController_createTransaction(request: any, response: any, next: any) {
+            const args = {
+                    requestBody: {"in":"body","name":"requestBody","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"type":{"ref":"TransactionType","required":true},"amount":{"dataType":"double","required":true},"toAccountNumber":{"dataType":"string","required":true},"fromAccountNumber":{"dataType":"string","required":true}}},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TransactionController();
+
+
+              const promise = controller.createTransaction.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/transactions/:accountNumber/recent',
+            ...(fetchMiddlewares<RequestHandler>(TransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(TransactionController.prototype.getRecentTransactions)),
+
+            function TransactionController_getRecentTransactions(request: any, response: any, next: any) {
+            const args = {
+                    accountNumber: {"in":"path","name":"accountNumber","required":true,"dataType":"string"},
+                    limit: {"in":"query","name":"limit","dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TransactionController();
+
+
+              const promise = controller.getRecentTransactions.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/transactions/transfer',
+            ...(fetchMiddlewares<RequestHandler>(TransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(TransactionController.prototype.transferBetweenAccounts)),
+
+            function TransactionController_transferBetweenAccounts(request: any, response: any, next: any) {
+            const args = {
+                    requestBody: {"in":"body","name":"requestBody","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"amount":{"dataType":"double","required":true},"toAccountNumber":{"dataType":"string","required":true},"fromAccountNumber":{"dataType":"string","required":true}}},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TransactionController();
+
+
+              const promise = controller.transferBetweenAccounts.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/transactions/:accountNumber',
+            ...(fetchMiddlewares<RequestHandler>(TransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(TransactionController.prototype.listAllTransactions)),
+
+            function TransactionController_listAllTransactions(request: any, response: any, next: any) {
+            const args = {
+                    accountNumber: {"in":"path","name":"accountNumber","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TransactionController();
+
+
+              const promise = controller.listAllTransactions.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/transactions/:accountNumber/balance',
+            ...(fetchMiddlewares<RequestHandler>(TransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(TransactionController.prototype.getAccountBalanceAfterTransactions)),
+
+            function TransactionController_getAccountBalanceAfterTransactions(request: any, response: any, next: any) {
+            const args = {
+                    accountNumber: {"in":"path","name":"accountNumber","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TransactionController();
+
+
+              const promise = controller.getAccountBalanceAfterTransactions.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/transactions/:accountNumber/date-range',
+            ...(fetchMiddlewares<RequestHandler>(TransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(TransactionController.prototype.getTransactionsByDateRange)),
+
+            function TransactionController_getTransactionsByDateRange(request: any, response: any, next: any) {
+            const args = {
+                    accountNumber: {"in":"path","name":"accountNumber","required":true,"dataType":"string"},
+                    startDate: {"in":"query","name":"startDate","required":true,"dataType":"string"},
+                    endDate: {"in":"query","name":"endDate","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TransactionController();
+
+
+              const promise = controller.getTransactionsByDateRange.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/transactions/:transactionId/exists',
+            ...(fetchMiddlewares<RequestHandler>(TransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(TransactionController.prototype.transactionExists)),
+
+            function TransactionController_transactionExists(request: any, response: any, next: any) {
+            const args = {
+                    transactionId: {"in":"path","name":"transactionId","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TransactionController();
+
+
+              const promise = controller.transactionExists.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/transactions/:transactionId/reverse',
+            ...(fetchMiddlewares<RequestHandler>(TransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(TransactionController.prototype.reverseTransaction)),
+
+            function TransactionController_reverseTransaction(request: any, response: any, next: any) {
+            const args = {
+                    transactionId: {"in":"path","name":"transactionId","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TransactionController();
+
+
+              const promise = controller.reverseTransaction.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.put('/transactions',
+            ...(fetchMiddlewares<RequestHandler>(TransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(TransactionController.prototype.updateTransaction)),
+
+            function TransactionController_updateTransaction(request: any, response: any, next: any) {
+            const args = {
+                    transaction: {"in":"body","name":"transaction","required":true,"ref":"Transaction"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TransactionController();
+
+
+              const promise = controller.updateTransaction.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.delete('/transactions/:transactionId',
+            ...(fetchMiddlewares<RequestHandler>(TransactionController)),
+            ...(fetchMiddlewares<RequestHandler>(TransactionController.prototype.deleteTransaction)),
+
+            function TransactionController_deleteTransaction(request: any, response: any, next: any) {
+            const args = {
+                    transactionId: {"in":"path","name":"transactionId","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new TransactionController();
+
+
+              const promise = controller.deleteTransaction.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

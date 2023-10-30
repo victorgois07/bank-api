@@ -1,11 +1,7 @@
-import { BankAccount } from '../../core/entities/BankAccount';
-import { Transaction } from '../../core/entities/Transaction';
+import { AccountType, BankAccount } from '../../core/entities/BankAccount';
+import { Transaction, TransactionType } from '../../core/entities/Transaction';
 import { IBankAccountRepository } from '../../core/repositories/BankAccountRepository';
 import { ITransactionRepository } from '../../core/repositories/TransactionRepository';
-import {
-  AccountType,
-  TransactionType,
-} from '../infra/db/prisma/generated/client';
 
 export class BankAccountUseCases {
   constructor(

@@ -1,11 +1,31 @@
-import { Body, Controller, Delete, Get, Path, Post, Put, Route } from 'tsoa';
-import { BankAccount } from '../../core/entities/BankAccount';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Path,
+  Post,
+  Put,
+  Route,
+  Tags,
+} from 'tsoa';
+import { AccountType, BankAccount } from '../../core/entities/BankAccount';
 import { Transaction } from '../../core/entities/Transaction';
-import { AccountType } from '../infra/db/prisma/generated/client';
+import {
+  accountNumberSchema,
+  createBankAccountSchema,
+  createTransactionSchema,
+  depositWithdrawSchema,
+  searchBankAccountSchema,
+  transferBetweenAccountsSchema,
+  updateBankAccountSchema,
+} from '../../core/validations/BankAccountValidations';
+import { validateWithJoi } from '../../utils/validateWithJoi';
 import { BankAccountRepository } from '../repositories/BankAccountRepository';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import { BankAccountUseCases } from '../useCases/BankAccountUseCases';
 
+@Tags('Bank Accounts')
 @Route('bank-accounts')
 export class BankAccountController extends Controller {
   private bankAccountUseCases: BankAccountUseCases;
@@ -20,10 +40,21 @@ export class BankAccountController extends Controller {
     );
   }
 
+  validateAccountNumber(accountNumber: string) {
+    validateWithJoi<{ accountNumber: string }>(
+      { accountNumber },
+      accountNumberSchema
+    );
+  }
+
   @Post()
   public async create(
     @Body() requestBody: { accountNumber: string; accountType: AccountType }
   ): Promise<BankAccount> {
+    validateWithJoi<{ accountNumber: string; accountType: AccountType }>(
+      requestBody,
+      createBankAccountSchema
+    );
     return this.bankAccountUseCases.create(
       requestBody.accountNumber,
       requestBody.accountType
@@ -34,6 +65,7 @@ export class BankAccountController extends Controller {
   public async read(
     @Path() accountNumber: string
   ): Promise<BankAccount | null> {
+    this.validateAccountNumber(accountNumber);
     return this.bankAccountUseCases.findById(accountNumber);
   }
 
@@ -42,6 +74,11 @@ export class BankAccountController extends Controller {
     @Path() accountNumber: string,
     @Body() requestBody: { accountType: AccountType; balance: number }
   ): Promise<BankAccount> {
+    this.validateAccountNumber(accountNumber);
+    validateWithJoi<{ accountType: AccountType; balance: number }>(
+      requestBody,
+      updateBankAccountSchema
+    );
     return this.bankAccountUseCases.update(
       accountNumber,
       requestBody.accountType,
@@ -51,11 +88,13 @@ export class BankAccountController extends Controller {
 
   @Delete('{accountNumber}')
   public async delete(@Path() accountNumber: string): Promise<void> {
+    this.validateAccountNumber(accountNumber);
     await this.bankAccountUseCases.delete(accountNumber);
   }
 
   @Get('by-id/{id}')
   public async findById(@Path() id: string): Promise<BankAccount | null> {
+    validateWithJoi<string>(id, accountNumberSchema);
     return this.bankAccountUseCases.findById(id);
   }
 
@@ -69,6 +108,8 @@ export class BankAccountController extends Controller {
     @Path() accountNumber: string,
     @Body() requestBody: { amount: number }
   ): Promise<BankAccount> {
+    this.validateAccountNumber(accountNumber);
+    validateWithJoi<{ amount: number }>(requestBody, depositWithdrawSchema);
     return this.bankAccountUseCases.deposit(accountNumber, requestBody.amount);
   }
 
@@ -77,6 +118,8 @@ export class BankAccountController extends Controller {
     @Path() accountNumber: string,
     @Body() requestBody: { amount: number }
   ): Promise<BankAccount> {
+    this.validateAccountNumber(accountNumber);
+    validateWithJoi<{ amount: number }>(requestBody, depositWithdrawSchema);
     return this.bankAccountUseCases.withdraw(accountNumber, requestBody.amount);
   }
 
@@ -88,6 +131,10 @@ export class BankAccountController extends Controller {
       minBalance?: number;
     }
   ): Promise<BankAccount[]> {
+    validateWithJoi<{
+      accountType?: AccountType;
+      minBalance?: number;
+    }>(requestBody, searchBankAccountSchema);
     return this.bankAccountUseCases.searchAccounts(requestBody);
   }
 
@@ -101,6 +148,12 @@ export class BankAccountController extends Controller {
       type: Transaction['type'];
     }
   ): Promise<Transaction> {
+    validateWithJoi<{
+      fromAccountNumber: string;
+      toAccountNumber: string;
+      amount: number;
+      type: Transaction['type'];
+    }>(requestBody, createTransactionSchema);
     return this.bankAccountUseCases.createTransaction(
       requestBody.fromAccountNumber,
       requestBody.toAccountNumber,
@@ -113,6 +166,7 @@ export class BankAccountController extends Controller {
   public async getRecentTransactions(
     @Path() accountNumber: string
   ): Promise<Transaction[]> {
+    this.validateAccountNumber(accountNumber);
     return this.bankAccountUseCases.getRecentTransactions(accountNumber);
   }
 
@@ -125,6 +179,11 @@ export class BankAccountController extends Controller {
       amount: number;
     }
   ): Promise<void> {
+    validateWithJoi<{
+      fromAccountNumber: string;
+      toAccountNumber: string;
+      amount: number;
+    }>(requestBody, transferBetweenAccountsSchema);
     return this.bankAccountUseCases.transferBetweenAccounts(
       requestBody.fromAccountNumber,
       requestBody.toAccountNumber,
@@ -136,6 +195,7 @@ export class BankAccountController extends Controller {
   public async getTransactionsForAccount(
     @Path() accountNumber: string
   ): Promise<Transaction[]> {
+    this.validateAccountNumber(accountNumber);
     return this.bankAccountUseCases.getTransactionsForAccount(accountNumber);
   }
 }

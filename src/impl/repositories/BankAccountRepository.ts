@@ -1,11 +1,7 @@
-import { BankAccount } from '../../core/entities/BankAccount';
+import { AccountType, BankAccount } from '../../core/entities/BankAccount';
 import { BankAccountSearchCriteria } from '../../core/entities/BankAccountSearchCriteria';
 import { IBankAccountRepository } from '../../core/repositories/BankAccountRepository';
-import {
-  AccountType,
-  Prisma,
-  PrismaClient,
-} from '../infra/db/prisma/generated/client';
+import { Prisma, PrismaClient } from '../infra/db/prisma/generated/client';
 
 export class BankAccountRepository implements IBankAccountRepository {
   private prisma: PrismaClient;
@@ -36,7 +32,7 @@ export class BankAccountRepository implements IBankAccountRepository {
 
     return new BankAccount(
       bankAccount.accountNumber,
-      bankAccount.accountType,
+      bankAccount.accountType as AccountType,
       bankAccount.balance,
       bankAccount.createdAt
     );

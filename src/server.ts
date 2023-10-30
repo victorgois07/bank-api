@@ -7,6 +7,7 @@ import expressWinston from 'express-winston';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { join } from 'path';
+import { ValidateError } from 'tsoa';
 import routes from './routes';
 import './routes/routes';
 import logger from './utils/logger';
@@ -22,8 +23,12 @@ app.use(cors());
 app.use(helmet());
 
 const errorHandler: ErrorRequestHandler = (err, req, res) => {
-  res.status(err.status || 500);
-  res.json({ error: err.message });
+  if (err instanceof ValidateError) {
+    res.status(400).json({ error: err.message });
+  } else {
+    console.error(err);
+    res.status(500).json({ error: 'An unexpected error occurred.' });
+  }
 };
 
 app.use(routes);
@@ -39,6 +44,7 @@ app.use(
     winstonInstance: logger,
   })
 );
+
 const PORT = process.env.PORT || 3000;
 
 app.use(errorHandler);

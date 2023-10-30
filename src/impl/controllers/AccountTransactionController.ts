@@ -1,74 +1,90 @@
-import { Request, Response } from 'express';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Path,
+  Post,
+  Put,
+  Route,
+  Tags,
+} from 'tsoa';
 import { AccountTransaction } from '../../core/entities/AccountTransaction';
+import {
+  createAccountTransactionSchema,
+  updateAccountTransactionSchema,
+} from '../../core/validations/AccountTransactionValidations';
+import { transactionIdSchema } from '../../core/validations/TransactionValidations';
+import { validateWithJoi } from '../../utils/validateWithJoi';
+import { AccountTransactionRepository } from '../repositories/AccountTransactionRepository';
 import { AccountTransactionUseCases } from '../useCases/AccountTransactionUseCases';
 
-export class AccountTransactionController {
+@Tags('Account Transactions')
+@Route('account-transactions')
+export class AccountTransactionController extends Controller {
   private accountTransactionUseCases: AccountTransactionUseCases;
 
-  constructor(accountTransactionUseCases: AccountTransactionUseCases) {
-    this.accountTransactionUseCases = accountTransactionUseCases;
+  constructor() {
+    super();
+    const accountTransactionRepository = new AccountTransactionRepository();
+    this.accountTransactionUseCases = new AccountTransactionUseCases(
+      accountTransactionRepository
+    );
   }
 
-  async createTransaction(req: Request, res: Response) {
-    try {
-      const transactionData: AccountTransaction = req.body;
-      const transaction =
-        await this.accountTransactionUseCases.createTransaction(
-          transactionData
-        );
-      res.status(201).json(transaction);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
-    }
+  @Post()
+  public async createTransaction(
+    @Body() transactionData: AccountTransaction
+  ): Promise<AccountTransaction> {
+    validateWithJoi<AccountTransaction>(
+      transactionData,
+      createAccountTransactionSchema
+    );
+    return this.accountTransactionUseCases.createTransaction(transactionData);
   }
 
-  async getTransactionById(req: Request, res: Response) {
-    try {
-      const transactionId = req.params.id;
-      const transaction =
-        await this.accountTransactionUseCases.getTransactionById(transactionId);
-      if (transaction) {
-        res.status(200).json(transaction);
-      } else {
-        res.status(404).json({ message: 'Transaction not found.' });
-      }
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
-    }
+  @Get('{transactionId}')
+  public async getTransactionById(
+    @Path() transactionId: string
+  ): Promise<AccountTransaction | null> {
+    validateWithJoi<{ transactionId: string }>(
+      { transactionId },
+      transactionIdSchema
+    );
+    return this.accountTransactionUseCases.getTransactionById(transactionId);
   }
 
-  async updateTransaction(req: Request, res: Response) {
-    try {
-      const transactionId = req.params.id;
-      const transactionData: AccountTransaction = req.body;
-      if (transactionId !== transactionData.id) {
-        res.status(400).json({ message: 'Transaction ID mismatch.' });
-        return;
-      }
-      await this.accountTransactionUseCases.updateTransaction(transactionData);
-      res.status(204).end();
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+  @Put('{transactionId}')
+  public async updateTransaction(
+    @Path() transactionId: string,
+    @Body() transactionData: AccountTransaction
+  ): Promise<void> {
+    validateWithJoi<{ transactionId: string }>(
+      { transactionId },
+      transactionIdSchema
+    );
+    validateWithJoi<AccountTransaction>(
+      transactionData,
+      updateAccountTransactionSchema
+    );
+    if (transactionId !== transactionData.id) {
+      this.setStatus(400);
+      return Promise.reject({ message: 'Transaction ID mismatch.' });
     }
+    return this.accountTransactionUseCases.updateTransaction(transactionData);
   }
 
-  async deleteTransaction(req: Request, res: Response) {
-    try {
-      const transactionId = req.params.id;
-      await this.accountTransactionUseCases.deleteTransaction(transactionId);
-      res.status(204).end();
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
-    }
+  @Delete('{transactionId}')
+  public async deleteTransaction(@Path() transactionId: string): Promise<void> {
+    validateWithJoi<{ transactionId: string }>(
+      { transactionId },
+      transactionIdSchema
+    );
+    return this.accountTransactionUseCases.deleteTransaction(transactionId);
   }
 
-  async listTransactions(req: Request, res: Response) {
-    try {
-      const transactions =
-        await this.accountTransactionUseCases.listTransactions();
-      res.status(200).json(transactions);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
-    }
+  @Get()
+  public async listTransactions(): Promise<AccountTransaction[]> {
+    return this.accountTransactionUseCases.listTransactions();
   }
 }

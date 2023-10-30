@@ -7,10 +7,7 @@
     "start": "ts-node src/server.ts",
     "dev": "nodemon",
     "build": "tsc",
-    "test": "jest",
-    "generate-routes": "tsoa routes",
-    "generate-spec": "tsoa spec",
-    "generate-tsoa": "npm run generate-routes && npm run generate-spec"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -55,6 +52,6 @@
       "src"
     ],
     "ext": "ts",
-    "exec": "ts-node src/server.ts"
+    "exec": "ts-node src/server.ts && tsoa routes && tsoa spec"
   }
 }

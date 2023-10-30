@@ -1,8 +1,10 @@
 import { ObjectId } from 'bson';
-import {
-  AccountTransaction,
-  AccountType,
-} from '../../impl/infra/db/prisma/generated/client';
+import { AccountTransaction } from './AccountTransaction';
+
+export enum AccountType {
+  CORRENTE = 'CORRENTE',
+  POUPANCA = 'POUPANCA',
+}
 
 export class BankAccount {
   id: string;

@@ -6,38 +6,43 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"%24Enums.AccountType": {
-				"type": "string",
+			"AccountType": {
 				"enum": [
 					"CORRENTE",
 					"POUPANCA"
-				]
+				],
+				"type": "string"
 			},
-			"AccountType": {
-				"$ref": "#/components/schemas/%24Enums.AccountType"
-			},
-			"%24Result.DefaultSelection_Prisma.%24AccountTransactionPayload_": {
+			"AccountTransaction": {
 				"properties": {
-					"transactionId": {
+					"id": {
 						"type": "string"
 					},
 					"bankAccountId": {
 						"type": "string"
 					},
-					"id": {
+					"transactionId": {
 						"type": "string"
+					},
+					"fromAccount": {
+						"$ref": "#/components/schemas/BankAccount"
+					},
+					"toAccount": {
+						"$ref": "#/components/schemas/BankAccount"
+					},
+					"sentTransaction": {
+						"$ref": "#/components/schemas/Transaction"
+					},
+					"receivedTransaction": {
+						"$ref": "#/components/schemas/Transaction"
 					}
 				},
 				"required": [
-					"transactionId",
 					"bankAccountId",
-					"id"
+					"transactionId"
 				],
-				"type": "object"
-			},
-			"AccountTransaction": {
-				"$ref": "#/components/schemas/%24Result.DefaultSelection_Prisma.%24AccountTransactionPayload_",
-				"description": "Model AccountTransaction"
+				"type": "object",
+				"additionalProperties": false
 			},
 			"BankAccount": {
 				"properties": {
@@ -83,16 +88,13 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"%24Enums.TransactionType": {
-				"type": "string",
+			"TransactionType": {
 				"enum": [
 					"PIX",
 					"DEPOSIT",
 					"WITHDRAW"
-				]
-			},
-			"TransactionType": {
-				"$ref": "#/components/schemas/%24Enums.TransactionType"
+				],
+				"type": "string"
 			},
 			"Transaction": {
 				"properties": {
@@ -166,6 +168,151 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
+		"/account-transactions": {
+			"post": {
+				"operationId": "CreateTransaction",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AccountTransaction"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Account Transactions"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AccountTransaction"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "ListTransactions",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/AccountTransaction"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Account Transactions"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/account-transactions/{transactionId}": {
+			"get": {
+				"operationId": "GetTransactionById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/AccountTransaction"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Account Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "transactionId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateTransaction",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Account Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "transactionId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AccountTransaction"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteTransaction",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Account Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "transactionId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/bank-accounts": {
 			"post": {
 				"operationId": "Create",
@@ -181,6 +328,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -223,6 +373,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": []
 			}
@@ -247,6 +400,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [
 					{
@@ -273,6 +429,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [
 					{
@@ -315,6 +474,9 @@
 						"description": "No content"
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [
 					{
@@ -348,6 +510,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [
 					{
@@ -376,6 +541,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [
 					{
@@ -423,6 +591,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [
 					{
@@ -473,6 +644,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -511,6 +685,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -564,6 +741,9 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [
 					{
@@ -585,6 +765,9 @@
 						"description": "No content"
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -634,11 +817,430 @@
 						}
 					}
 				},
+				"tags": [
+					"Bank Accounts"
+				],
 				"security": [],
 				"parameters": [
 					{
 						"in": "path",
 						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/transactions": {
+			"post": {
+				"operationId": "CreateTransaction",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Transaction"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transactions"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"type": {
+										"$ref": "#/components/schemas/TransactionType"
+									},
+									"amount": {
+										"type": "number",
+										"format": "double"
+									},
+									"toAccountNumber": {
+										"type": "string"
+									},
+									"fromAccountNumber": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"type",
+									"amount",
+									"toAccountNumber",
+									"fromAccountNumber"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"operationId": "UpdateTransaction",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Transaction"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transactions"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Transaction"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/transactions/{accountNumber}/recent": {
+			"get": {
+				"operationId": "GetRecentTransactions",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Transaction"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/transactions/transfer": {
+			"post": {
+				"operationId": "TransferBetweenAccounts",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Transaction"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transactions"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"amount": {
+										"type": "number",
+										"format": "double"
+									},
+									"toAccountNumber": {
+										"type": "string"
+									},
+									"fromAccountNumber": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"amount",
+									"toAccountNumber",
+									"fromAccountNumber"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/transactions/{accountNumber}": {
+			"get": {
+				"operationId": "ListAllTransactions",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Transaction"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/transactions/{accountNumber}/balance": {
+			"get": {
+				"operationId": "GetAccountBalanceAfterTransactions",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"balance": {
+											"type": "number",
+											"format": "double"
+										}
+									},
+									"required": [
+										"balance"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/transactions/{accountNumber}/date-range": {
+			"get": {
+				"operationId": "GetTransactionsByDateRange",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Transaction"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "accountNumber",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "startDate",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "endDate",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/transactions/{transactionId}/exists": {
+			"get": {
+				"operationId": "TransactionExists",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"exists": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"exists"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "transactionId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/transactions/{transactionId}/reverse": {
+			"post": {
+				"operationId": "ReverseTransaction",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "transactionId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/transactions/{transactionId}": {
+			"delete": {
+				"operationId": "DeleteTransaction",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "transactionId",
 						"required": true,
 						"schema": {
 							"type": "string"
